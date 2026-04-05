@@ -6,6 +6,12 @@ description = "Routra Rust SDK — OpenAI-compatible client with intelligent GPU
 license = "MIT"
 repository = "https://github.com/routra-dev/sdk-rust"
 keywords = ["routra", "openai", "llm", "gpu", "routing"]
+build = "build.rs"
+
+[features]
+# Enable the management API client (generated from OpenAPI spec via progenitor).
+# Requires the contracts spec at build time — see build.rs for path resolution.
+management = []
 
 [dependencies]
 reqwest = { version = "0.12", features = ["json", "stream", "rustls-tls"], default-features = false }
@@ -13,6 +19,10 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1"
+
+[build-dependencies]
+# progenitor generates a typed management API client from the OpenAPI spec.
+progenitor = "0.9"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full", "test-util"] }
