@@ -2,7 +2,7 @@
 name = "routra"
 version = "0.1.0"
 edition = "2024"
-description = "Routra Rust SDK — OpenAI-compatible client with intelligent GPU cloud routing"
+description = "Routra Rust SDK - OpenAI-compatible client with intelligent GPU cloud routing"
 license = "MIT"
 repository = "https://github.com/routra-dev/sdk-rust"
 keywords = ["routra", "openai", "llm", "gpu", "routing"]
@@ -10,7 +10,7 @@ build = "build.rs"
 
 [features]
 # Enable the management API client (generated from OpenAPI spec via progenitor).
-# Requires the contracts spec at build time — see build.rs for path resolution.
+# Requires the contracts spec at build time - see build.rs for path resolution.
 management = []
 
 [dependencies]

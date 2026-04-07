@@ -6,7 +6,7 @@ const BASE_URL: &str = "https://api.routra.dev/v1";
 
 /// Routra async HTTP client.
 ///
-/// Drop-in equivalent for the OpenAI client — just change the API key and base URL.
+/// Drop-in equivalent for the OpenAI client - just change the API key and base URL.
 /// Set a `policy` to apply routing constraints (cheapest, balanced, gdpr-eu, ...).
 pub struct Routra {
     client: Client,

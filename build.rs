@@ -1,9 +1,9 @@
-//! Build script — generates a typed management API client from the Routra OpenAPI spec
+//! Build script - generates a typed management API client from the Routra OpenAPI spec
 //! using `progenitor`.
 //!
 //! Spec resolution order (first wins):
-//!   1. `CONTRACTS_SPEC` env var — point at any local or remote path
-//!   2. `./contracts/openapi/routra.yaml` — when `contracts` is a git submodule
+//!   1. `CONTRACTS_SPEC` env var - point at any local or remote path
+//!   2. `./contracts/openapi/routra.yaml` - when `contracts` is a git submodule
 //!
 //! To add contracts as a submodule (one-time, in sdk-rust repo root):
 //!   git submodule add https://github.com/routra/contracts contracts
@@ -29,11 +29,11 @@ fn main() {
     } else {
         let p = std::path::PathBuf::from("contracts/openapi/routra.yaml");
         if !p.exists() {
-            // Spec not available — skip codegen, the committed generated file
+            // Spec not available - skip codegen, the committed generated file
             // (if any) will be used. This allows `cargo build` without the
             // submodule for users who only need the proxy/chat APIs.
             println!(
-                "cargo:warning=contracts/openapi/routra.yaml not found — \
+                "cargo:warning=contracts/openapi/routra.yaml not found - \
                  skipping management API codegen. \
                  Run: git submodule update --init contracts"
             );
