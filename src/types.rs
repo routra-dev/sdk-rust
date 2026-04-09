@@ -58,10 +58,10 @@ pub struct Usage {
 pub struct RoutingMetadata {
     pub provider: String,
     pub latency_ms: u32,
-    pub cost_usd: f64,
-    pub input_tokens: u32,
-    pub output_tokens: u32,
-    pub score_selected: f64,
-    pub failover: bool,
+    pub score: f64,
+    pub cost_usd: Option<f64>,
+    pub input_tokens: Option<i32>,
+    pub output_tokens: Option<i32>,
+    pub failover: Option<bool>,
     pub ttfb_ms: Option<u32>,
 }

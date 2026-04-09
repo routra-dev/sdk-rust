@@ -45,19 +45,19 @@ fn main() {
     let spec_str = std::fs::read_to_string(&spec_path)
         .expect("failed to read OpenAPI spec");
 
-    let spec = serde_json::from_str::<serde_json::Value>(
+    let spec = serde_json::from_str::<openapiv3::OpenAPI>(
         &serde_yaml::from_str::<serde_json::Value>(&spec_str)
             .expect("invalid YAML in spec")
             .to_string(),
     )
-    .expect("failed to reserialize spec as JSON");
+    .expect("failed to deserialize spec as OpenAPI");
 
     let mut generator = progenitor::Generator::default();
     let tokens = generator
         .generate_tokens(&spec)
         .expect("progenitor failed to generate client");
 
-    let out_dir = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap());
+    let out_dir = std::path::PathBuf::from(std::env::var("OUT_DIR").expect("OUT_DIR must be set by Cargo"));
     let out_file = out_dir.join("management.rs");
     std::fs::write(&out_file, tokens.to_string()).expect("failed to write generated client");
 

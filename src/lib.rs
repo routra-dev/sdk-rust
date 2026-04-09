@@ -20,7 +20,7 @@
 //!
 //!     println!("{}", resp.choices[0].message.content);
 //!     if let Some(meta) = resp.routra {
-//!         println!("provider={} cost=${:.6}", meta.provider, meta.cost_usd);
+//!         println!("provider={} score={:.4}", meta.provider, meta.score);
 //!     }
 //!     Ok(())
 //! }
