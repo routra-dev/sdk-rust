@@ -6,14 +6,14 @@ Async HTTP client for the Routra API. Presents an OpenAI-compatible interface wi
 
 ```toml
 [dependencies]
-routra = "0.1"
+routra-sdk = "0.1"
 tokio = { version = "1", features = ["rt", "macros"] }
 ```
 
 To also use the management API (keys, policies, usage, billing):
 
 ```toml
-routra = { version = "0.1", features = ["management"] }
+routra-sdk = { version = "0.1", features = ["management"] }
 ```
 
 ## Quick Start
