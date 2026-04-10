@@ -62,6 +62,105 @@ pub struct RoutingMetadata {
     pub cost_usd: Option<f64>,
     pub input_tokens: Option<i32>,
     pub output_tokens: Option<i32>,
+    /// Non-token pricing unit: "images", "characters", "seconds".
+    pub usage_unit: Option<String>,
+    /// Non-token usage value (e.g. image count, character count, duration).
+    pub usage_value: Option<f64>,
     pub failover: Option<bool>,
     pub ttfb_ms: Option<u32>,
+}
+
+// ── Embeddings ────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct EmbeddingRequest {
+    pub model: String,
+    pub input: EmbeddingInput,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub encoding_format: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(untagged)]
+pub enum EmbeddingInput {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+impl Default for EmbeddingInput {
+    fn default() -> Self {
+        Self::Single(String::new())
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct EmbeddingResponse {
+    pub data: Vec<EmbeddingData>,
+    pub model: String,
+    pub usage: Option<EmbeddingUsage>,
+    pub routra: Option<RoutingMetadata>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct EmbeddingData {
+    pub index: u32,
+    pub embedding: Vec<f32>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct EmbeddingUsage {
+    pub prompt_tokens: u32,
+    pub total_tokens: u32,
+}
+
+// ── Image Generation ──────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct ImageRequest {
+    pub model: String,
+    pub prompt: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub n: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quality: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub response_format: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ImageResponse {
+    pub created: u64,
+    pub data: Vec<ImageData>,
+    pub routra: Option<RoutingMetadata>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ImageData {
+    pub url: Option<String>,
+    pub b64_json: Option<String>,
+    pub revised_prompt: Option<String>,
+}
+
+// ── Text-to-Speech ────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct SpeechRequest {
+    pub model: String,
+    pub input: String,
+    pub voice: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub response_format: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub speed: Option<f32>,
+}
+
+// ── Speech-to-Text ────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct TranscriptionResponse {
+    pub text: String,
+    pub duration: Option<f64>,
+    pub routra: Option<RoutingMetadata>,
 }

@@ -1,31 +1,20 @@
 [package]
 name = "routra-sdk"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.94"
 description = "Routra Rust SDK - OpenAI-compatible client with intelligent GPU cloud routing"
 license = "MIT"
 repository = "https://github.com/routra-dev/sdk-rust"
 keywords = ["routra", "openai", "llm", "gpu", "routing"]
-build = "build.rs"
-
-[features]
-# Enable the management API client (generated from OpenAPI spec via progenitor).
-# Requires the contracts spec at build time - see build.rs for path resolution.
-management = []
 
 [dependencies]
-reqwest = { version = "0.12", features = ["json", "stream", "rustls-tls"], default-features = false }
+reqwest = { version = "0.12", features = ["json", "stream", "rustls-tls", "multipart"], default-features = false }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt", "macros"] }
-
-[build-dependencies]
-# progenitor generates a typed management API client from the OpenAPI spec.
-progenitor = "0.9"
-openapiv3 = "2"
-serde_json = "1"
-serde_yaml = "0.9"
+bytes = "1"
+thiserror = "2"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full", "test-util"] }

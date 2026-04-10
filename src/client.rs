@@ -1,6 +1,10 @@
 use reqwest::{header, Client};
 
-use crate::types::{ChatRequest, ChatResponse};
+use crate::types::{
+    ChatRequest, ChatResponse, EmbeddingRequest, EmbeddingResponse, ImageRequest, ImageResponse,
+    SpeechRequest, TranscriptionResponse,
+};
+use crate::management::ManagementClient;
 
 const BASE_URL: &str = "https://api.routra.dev/v1";
 
@@ -24,8 +28,8 @@ impl Routra {
     /// The base URL is resolved from `ROUTRA_BASE_URL` env var (if set),
     /// otherwise defaults to `https://api.routra.dev/v1`.
     pub fn new(api_key: impl Into<String>) -> Self {
-        let base_url = std::env::var("ROUTRA_BASE_URL")
-            .unwrap_or_else(|_| BASE_URL.to_string());
+        let base_url =
+            std::env::var("ROUTRA_BASE_URL").unwrap_or_else(|_| BASE_URL.to_string());
         Self {
             client: Client::new(),
             api_key: api_key.into(),
@@ -47,24 +51,108 @@ impl Routra {
         self
     }
 
+    /// Build a request with auth and policy headers.
+    fn request(&self, method: reqwest::Method, path: &str) -> reqwest::RequestBuilder {
+        let url = format!("{}{}", self.base_url, path);
+        let mut builder = self
+            .client
+            .request(method, &url)
+            .header(header::AUTHORIZATION, format!("Bearer {}", self.api_key))
+            .header(header::CONTENT_TYPE, "application/json");
+
+        if let Some(policy) = &self.policy {
+            builder = builder.header("X-Routra-Policy", policy);
+        }
+        builder
+    }
+
     /// POST /v1/chat/completions
     pub async fn chat_completions(
         &self,
         req: ChatRequest,
     ) -> Result<ChatResponse, reqwest::Error> {
-        let url = format!("{}/chat/completions", self.base_url);
+        self.request(reqwest::Method::POST, "/chat/completions")
+            .json(&req)
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<ChatResponse>()
+            .await
+    }
+
+    /// POST /v1/embeddings
+    pub async fn embeddings(
+        &self,
+        req: EmbeddingRequest,
+    ) -> Result<EmbeddingResponse, reqwest::Error> {
+        self.request(reqwest::Method::POST, "/embeddings")
+            .json(&req)
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<EmbeddingResponse>()
+            .await
+    }
+
+    /// POST /v1/images/generations
+    pub async fn image_generate(
+        &self,
+        req: ImageRequest,
+    ) -> Result<ImageResponse, reqwest::Error> {
+        self.request(reqwest::Method::POST, "/images/generations")
+            .json(&req)
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<ImageResponse>()
+            .await
+    }
+
+    /// POST /v1/audio/speech — returns raw audio bytes.
+    pub async fn speech(&self, req: SpeechRequest) -> Result<bytes::Bytes, reqwest::Error> {
+        self.request(reqwest::Method::POST, "/audio/speech")
+            .json(&req)
+            .send()
+            .await?
+            .error_for_status()?
+            .bytes()
+            .await
+    }
+
+    /// POST /v1/audio/transcriptions — multipart file upload.
+    pub async fn transcribe(
+        &self,
+        file: Vec<u8>,
+        filename: impl Into<String>,
+        model: impl Into<String>,
+    ) -> Result<TranscriptionResponse, reqwest::Error> {
+        let url = format!("{}/audio/transcriptions", self.base_url);
+        let part = reqwest::multipart::Part::bytes(file).file_name(filename.into());
+        let form = reqwest::multipart::Form::new()
+            .text("model", model.into())
+            .part("file", part);
+
         let mut builder = self
             .client
             .post(&url)
             .header(header::AUTHORIZATION, format!("Bearer {}", self.api_key))
-            .header(header::CONTENT_TYPE, "application/json")
-            .json(&req);
+            .multipart(form);
 
         if let Some(policy) = &self.policy {
             builder = builder.header("X-Routra-Policy", policy);
         }
 
-        let resp = builder.send().await?.error_for_status()?;
-        resp.json::<ChatResponse>().await
+        builder
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<TranscriptionResponse>()
+            .await
+    }
+
+    /// Return a [`ManagementClient`] that shares the same API key and base URL.
+    pub fn management(&self) -> ManagementClient {
+        let mgmt_base = self.base_url.trim_end_matches("/v1").trim_end_matches('/');
+        ManagementClient::new(&self.api_key, mgmt_base)
     }
 }

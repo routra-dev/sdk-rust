@@ -85,6 +85,17 @@ use routra::management;
 
 This requires the `contracts/openapi/routra.yaml` spec to be available at build time. See [build.rs](build.rs) for spec resolution.
 
+## Multimodal Support
+
+All OpenAI-compatible endpoints are proxied through Routra — including image generation, TTS, and STT. Use the standard OpenAI SDK methods with Routra's `auto:` routing aliases:
+
+- `auto:image` — routes to cheapest image provider (FLUX Schnell at $0.001 vs GPT Image 1.5 at $0.13)
+- `auto:tts` — routes to cheapest TTS provider
+- `auto:stt` — routes to cheapest STT provider
+- `auto:embed` — routes to cheapest embedding provider
+
+Or pin to a specific provider with `model: "openai/gpt-image-1.5"` or `model: "fireworks/flux-1-schnell"`.
+
 ## Error Handling
 
 All methods return `Result<T, reqwest::Error>`. Errors include network failures, HTTP error status codes, and JSON deserialization failures:

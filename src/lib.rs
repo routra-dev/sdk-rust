@@ -28,20 +28,12 @@
 
 mod client;
 mod types;
+pub mod management;
 
 pub use client::Routra;
-pub use types::{ChatRequest, ChatResponse, Choice, Message, RoutingMetadata, Usage};
-
-/// Generated management API client (keys, policies, usage, billing, etc.).
-///
-/// Enable with the `management` feature flag:
-/// ```toml
-/// routra = { version = "0.1", features = ["management"] }
-/// ```
-/// The client is generated at build time from the public Routra OpenAPI spec
-/// via `progenitor`. Add the `contracts` git submodule or set `CONTRACTS_SPEC`
-/// to point at `contracts/openapi/routra.yaml` before building.
-#[cfg(feature = "management")]
-pub mod management {
-    include!(concat!(env!("OUT_DIR"), "/management.rs"));
-}
+pub use types::{
+    ChatRequest, ChatResponse, Choice, EmbeddingData, EmbeddingInput, EmbeddingRequest,
+    EmbeddingResponse, EmbeddingUsage, ImageData, ImageRequest, ImageResponse, Message,
+    RoutingMetadata, SpeechRequest, TranscriptionResponse, Usage,
+};
+pub use management::ManagementClient;
